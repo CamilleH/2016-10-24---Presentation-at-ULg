@@ -1,0 +1,603 @@
+\documentclass{beamer}
+\usepackage{etex}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath,amsfonts}
+\usepackage{graphicx}
+\usepackage{pgfpages}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tikz,pgfplots}
+%\usepackage[european]{circuitikz}
+%\pgfplotsset{compat=newest}
+%\pgfplotsset{plot coordinates/math parser=false}
+%\usetikzlibrary{shapes,arrows}
+%\usetikzlibrary{decorations}
+%\usetikzlibrary{patterns}
+%\usepgfplotslibrary{patchplots} % triangle interpolation
+%\usepgfplotslibrary{external} % To avoid replotting the tikz figures every time
+%\usetikzlibrary{backgrounds}
+%\usetikzlibrary{calc}
+
+% Perso commands
+\newcommand*{\field}[1]{\mathbb{#1}} 
+\newcommand*{\R}{\field{R}} % real R
+\newcommand*{\vect}[1]{\left[ #1 \right]^{T}} % vectors
+\newcommand*{\prob}[1]{P\left[ #1 \right]}
+
+\newlength\fwidth 
+\setlength\fwidth{0.4\textwidth} 
+
+\usetheme{Frankfurt}
+\setbeamertemplate{items}[circle]
+\setbeamertemplate{enumerate items}[default]
+\setbeamertemplate{blocks}[rounded][shadow=false]
+\setbeamertemplate{navigation symbols}{}
+\setbeamercovered{transparent}
+
+\usepackage{remreset}% tiny package containing just the \@removefromreset command, to view circles for slides in Frankfurt theme
+\makeatletter
+\@removefromreset{subsection}{section}
+\makeatother
+\setcounter{subsection}{1}
+
+
+% Title Page Settings
+\title{Probabilistic security management for power system operations with  wind power}
+\author[Camille Hamon]{Camille Hamon\\
+camille.hamon@ntnu.no\\
+Department of electric power engineering\\
+Norwegian university of science and technology}
+\date[24/10/2016]{24/10/2016}
+
+\AtBeginSection[] % Do nothing for \subsection*
+{
+\begin{frame}<beamer>
+\frametitle{Outline}
+\tableofcontents[currentsection,subsectionstyle=hide]
+\end{frame}
+}
+
+\begin{document}
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents[subsectionstyle=hide]
+\end{frame}
+
+\section{Security}
+
+\begin{frame}
+\frametitle{N-1 criterion}
+\begin{itemize}
+\item The N-1 criterion captures the security of the system in terms of its robustness against contingencies. 
+\item System operators identify a list of contingencies against which the system must be secured.
+\item Contingencies = loss of generation units, faults on transmission lines, \ldots
+\end{itemize}
+
+\begin{block}{Security according to the N-1 criterion}
+  The power system is secure = the operational security limits are fulfilled after any contingency in the contingency list occurs.
+\end{block}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Security limits}
+\begin{itemize}
+\item If the system becomes too loaded, instability issues can occur or operational security constraints can be violated.
+\item Example:
+\begin{itemize}
+\item Voltage stability
+\item Small-signal stability
+\item Thermal limits of transmission lines
+\end{itemize}
+\end{itemize}
+\emph{Stability limits} can be defined as operating conditions beyond which the system becomes unstable or operational security constraints are violated.
+\end{frame}
+
+\begin{frame}[label=example]
+\frametitle{Example of voltage instability - 1}
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{Figs/Ieee9bus.pdf}
+\column{0.5\textwidth}
+\input{CPFieee9}
+\end{columns}
+\end{frame}
+
+\begin{frame}[label=exampledir]
+\frametitle{Example of voltage instability - 2}
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{Figs/Ieee9bus.pdf}
+\column{0.5\textwidth}
+\input{CPFieee9_3}
+Solid=All loads increase by the same amount\\
+Dashed=Load A increases double as much as the other two.
+\end{columns}
+\note{
+The direction of load increase is very important
+}
+\end{frame}
+
+\begin{frame}[label=examplecont]
+\frametitle{Example of voltage instability - 3}
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\textwidth]{Figs/Ieee9bus_fault89.pdf}
+\column{0.5\textwidth}
+\input{CPFieee9_cont89}
+Solid=System intact\\
+Dashed=Fault on line between buses 8 and 9.
+\end{columns}
+\note{
+If the system change, so does the maximum loading.
+
+If the system is damaged (loss of a line, \ldots), the distance to collapse decreases.
+}
+\end{frame}
+
+\begin{frame}
+\frametitle{Stability boundary}
+\begin{columns}
+\column{0.35\textwidth}
+\begin{center}
+\only<1>{\includegraphics[width=\textwidth]{Figs/Ieee9bus.pdf}}
+\only<2->{\includegraphics[width=\textwidth]{Figs/Ieee9bus_fault57.pdf}}
+\end{center}
+\column{0.65\textwidth}
+\begin{center}
+\only<1>{\includegraphics[width=0.8\textwidth]{Figs/StabBoundIEEE9}}
+\only<2->{\includegraphics[width=0.8\textwidth]{Figs/PrePostContingencySurfaces}}
+\end{center}
+\end{columns}
+\only<3>{\begin{block}{Security according to the N-1 criterion}
+The operating conditions must be within the pre- and post-contingency stability boundaries
+\end{block}}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Security management}
+  Two aspects:
+  \begin{description}
+  \item[Security assessment] Monitor the system and evaluate whether the N-1 criterion holds.
+  \item[Security enhancement] Automatic or manual actions to improve the security.
+  \end{description}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Security management in Sweden}
+  \begin{columns}
+    \column{0.5\textwidth}
+    \begin{itemize}
+    \item Four price areas separated by bottlenecks (=critical transmission corridors).
+    \item \textbf{Security assessment} The TSO monitors the power transfers across the bottlenecks. 
+    \item \textbf{Security enhancement} The TSO sends re-dispatch orders (increase/decrease production) if necessary.
+    \end{itemize}
+    \column{0.5\textwidth}
+  \begin{tikzpicture}
+\pgftext{\includegraphics[width=0.55\textwidth]{Figs/Snitten.jpg}}
+{\footnotesize
+\node at (2.3,2) {Price area SE1};
+\node at (1.5,0.25) {Price area SE2};
+\node at (1.5,-2) {Price area SE3};
+\node at (1,-3.3) {Price area SE4};
+}
+\end{tikzpicture}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Security management in Sweden - 2}
+\begin{columns}
+\column{0.6\textwidth}
+Security assessment:
+\begin{enumerate}
+\item A list of contingencies is defined.
+\item Every 15 minutes, for each contingency and each bottleneck, transmission limits are computed.
+\item The power transfers are monitored and checked against all computed transmission limits.
+\end{enumerate}
+Security enhancement:
+\begin{enumerate}
+\setcounter{enumi}{3}
+\item If the power transfers come close to one of the computed limits, re-dispatch the generation to decrease the power transfers.
+\end{enumerate}
+\column{0.4\textwidth}
+\begin{center}
+\includegraphics[width=0.85\textwidth]{Figs/SPICAjob}
+\end{center}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Security management in Sweden - 3}
+\begin{center}
+\includegraphics[height=6cm,width=0.75\textwidth]{Figs/SpicaResults.png}
+
+\footnotesize{Source: Sandberg, L., \& Roudén, K. (1992). \textit{The real-time supervision of transmission capacity in the swedish grid}. In S. C. Savulescu (Ed.), \textit{Real-time stability assessment in modern power system control centers}.}
+\end{center}
+\end{frame}
+
+\section{Security and uncertainty}
+
+\begin{frame}
+\frametitle{N-1 criterion}
+\includegraphics[width=0.9\textwidth]{Figs/StabBound-with-forecast.png}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Uncertainty - 1}
+\textbf{First source of uncertainty}: Load and wind power forecast errors.
+\vskip0.4cm
+\includegraphics[width=\textwidth]{Figs/StabBound-with-prob-forecast.png}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Probabilistic forecasts}
+Probabilistic forecasts give a joint probability distribution for the future net power injections, i.e.:
+\begin{enumerate}
+\item A set of possible future net power injections
+\item A probability density function
+\end{enumerate} \includegraphics[height=5cm,width=0.6\textwidth]{Figs/KarysStbBdAndForcast3D-1}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Uncertainty - 2}
+\textbf{Second source of uncertainty}: Contingencies occur randomly. 
+\vskip0.4cm
+\begin{tabular}[!htb]{lcccc}
+  \toprule
+  Fault & \textbf<1>{No fault} & \textbf<2>{Fault A} & \textbf<3>{Fault B} & \textbf<4>{Fault C} \\
+  \midrule
+  Probability & \textbf<1>{0.999} & \textbf<2>{0.0005} & \textbf<3>{0.0003} & \textbf<4>{0.0002} \\
+  \bottomrule
+\end{tabular}
+\vskip0.4cm
+\only<1>{\includegraphics[width=0.9\textwidth]{Figs/StabBound-prefault-with-prob-forecast.png}}
+\only<2>{\includegraphics[width=0.9\textwidth]{Figs/StabBound-faultA-with-prob-forecast.png}}
+\only<3>{\includegraphics[width=0.9\textwidth]{Figs/StabBound-faultB-with-prob-forecast.png}}
+\only<4>{\includegraphics[width=0.9\textwidth]{Figs/StabBound-faultC-with-prob-forecast.png}}
+\end{frame}
+
+\begin{frame}
+  \frametitle{N-1 criterion and uncertainty}
+\begin{block}{Security according to the N-1 criterion}
+The \textbf{operating conditions} must be within the pre- and post-contingency stability boundaries.
+\end{block}
+What does it mean when there is uncertainty on the operating conditions / occurrence of contingencies?
+\vskip0.2cm
+\begin{columns}
+  \begin{column}{0.45\textwidth}
+  \underline{Shortcomings of N-1 criterion:}
+  \begin{enumerate}
+  \item<1-2> Does not consider the uncertainty.
+    \begin{itemize}
+    \item Probability of occurrence of contingencies.
+    \item Probabilistic forecasts.
+    \end{itemize}
+  \item<1> Does not consider the extent of the violations.
+  \end{enumerate}    
+  \end{column}
+  \begin{column}{0.55\textwidth}
+\includegraphics[width=1.1\textwidth]{Figs/StabBound-with-prob-forecast.png}
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Changes to today's approach}
+\small{
+\begin{quote}
+  \textbf{Furthermore, and most relevant, the increase in penetration of variable generation further undermines the value of deterministic snapshot analysis}. To give a specific example: while the critical operating points of bulk power systems have traditionally been known, with the advent of wind and solar generation, these points are difficult to find, and require analysis of many more points. Hence, there is a need to study multiple scenarios, a process that is largely deterministic but could become computationally intractable. \textbf{Probabilistic techniques are developed by studying the underlying distribution of scenarios rather than a specific set of points that make up the distribution}.
+\end{quote}
+Lauby, M. et al. (2011). Balancing Act. IEEE Power and Energy Magazine}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Proposed approach}
+\underline{Inputs:} list of contingencies and their probability of occurrence, probabilistic forecasts for wind power and load.
+
+\begin{block}{Today: N-1 criterion}
+The power system must remain stable after any contingency in the pre-defined list occurs.
+\end{block}
+
+\begin{block}{Proposed: probabilistic approach}
+  \begin{enumerate}
+  \item Define the operating risk = probability of the system to be unstable / operational security limits to be violated.
+  \item ``Probabilistic N-1 criterion'': Operating risk $\leq \alpha$.
+  \end{enumerate}
+\end{block}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Operating risk}
+  \begin{align*}
+& \text{Operating risk } \\
+&= \text{ Probability of the system to be unstable} \\
+ &= \sum_{\text{contingencies}} \left( \text{ Prob. contingency } \times \text{Prob. unstable after contingency} \right)
+  \end{align*}
+\begin{itemize}
+\item New probabilistic criterion: Operating risk $\leq \alpha$.
+\item The operating risk is in general never zero. What we propose is to make this probability visible.
+\item $1-\alpha$ = level of system security.
+\end{itemize}    
+\end{frame}
+
+\begin{frame}
+  \frametitle{Operating risk - illustration}
+  \begin{align*}
+\text{Operating risk } = \sum_{\text{cont.}} \left( \text{ Prob. cont. } \times \text{Prob. unstable after cont.} \right)
+\end{align*}
+\only<1>{\includegraphics[width=1\textwidth]{Figs/StabBound-prefault-with-prob-forecast.png}}
+\only<2>{\includegraphics[width=1\textwidth]{Figs/StabBound-faultA-with-prob-forecast.png}}
+\only<3>{\includegraphics[width=1\textwidth]{Figs/StabBound-faultB-with-prob-forecast.png}}
+\only<4>{\includegraphics[width=1\textwidth]{Figs/StabBound-faultC-with-prob-forecast.png}}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Probabilistic security management}
+  Given the definition of the operating risk, the proposed framework for probabilistic security management has two aspects:
+  \begin{description}
+  \item[Security assessment] Given probabilistic forecasts for a time ahead in the future, a list of contingencies and their probability of occurrence, evaluate the operating risk.
+  \item[Security enhancement] Given some controllable parameters in the system, find the most economical way of ensuring that the operating risk remains below a certain threshold. 
+    \begin{align*}
+      \min \quad & \text{Re-dispatch cost} \\
+      \text{such that} \quad & \text{Operating risk} \leq \alpha
+    \end{align*}
+  \end{description}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Challenges}
+  \begin{enumerate}
+  \item The stability boundaries are not known. We can obtain points on them (continuation power flows) but it is time consuming.
+  \item Security assessment: the operating risk is very low $\Rightarrow$ challenging to estimate it by naïve Monte-Carlo simulations (required number of samples $\propto \frac{1}{\text{prob}}$).
+  \item Security enhancement: control actions change the stability boundary and, hence, the operating risk. However, the impact of control actions on the stability boundaries is difficult to capture.
+  \item Modelling: we need probabilistic forecasts for net power injections (load and wind power) and models for the contingency probabilities.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Modelling}
+  \begin{enumerate}
+  \item We used existing research for the probabilistic forecasts: joint normal transform (which fits a Gaussian copula to model the correlation between forecast errors).
+  \item We assumed arbitrary values for the contingency probabilities. In reality, one can use threat-based models to get more accurate contingency probabilities for the system of interest.
+  \end{enumerate}
+\textbf{A lot of ongoing research for both modelling issues.}
+\end{frame}
+
+\section{Proposed methods}
+
+\begin{frame}
+  \frametitle{Contributions}
+  Contributions to three problems:
+  \begin{description}
+  \item[Problem 1] Parametrized approximation of the stability boundary.
+  \item[Problem 2] Security assessment: Evaluation of the operating risk.
+  \item[Problem 3] Security enhancement: Determine the optimal re-dispatch.
+  \end{description}
+\vskip0.5cm
+\centerline{\includegraphics[width=0.8\textwidth]{Figs/FrameworkContribRound-all}}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Problem 1: Parametrized approximation of the stability boundary}
+  \begin{columns}
+    \column{0.5\textwidth}
+\textbf{Challenges}:
+  \begin{itemize}
+  \item There does not exist any known parametrization of the stability boundary.
+  \item The stability boundary is made of different parts.
+  \end{itemize}
+    \column{0.5\textwidth}
+\includegraphics[width=1\textwidth]{Figs/StabBoundIEEE9}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Problem 1: Parametrized approximation of the stability boundary}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+  \textbf{Contribution}: 
+  \begin{itemize}
+  \item \underline{Second-order approximations} of the stability boundary are developed. 
+  \item They are based on \underline{second-order sensitivities} of the margin to the \underline{most likely points} on \underline{different parts} of the stability boundary.  \item Voltage stability, small-signal stability and line thermal limits are considered.
+  \end{itemize}      
+    \end{column}
+    \begin{column}{0.5\textwidth}
+\only<1>{\includegraphics[width=\textwidth]{Figs/SearchClosestPts.pdf}}
+\only<2>{\includegraphics[width=\textwidth]{Figs/ApproxActualOut.pdf}}
+\only<3>{\includegraphics[width=\textwidth]{Figs/ApproxActualIn.pdf}}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Problem 2: Tools for probabilistic security assessment}
+  \begin{columns}
+    \column{0.5\textwidth}
+\textbf{Challenges}:
+\begin{itemize}
+\item The operating risk is a probability that must be kept very small during normal operations of power systems.
+\item Estimating such probabilities is usually done by Monte-Carlo simulations.
+\item For such small probabilities, Monte-Carlo simulations are computationally demanding.
+\end{itemize}
+\column{0.5\textwidth}
+\includegraphics[height=5cm,width=1\textwidth]{Figs/KarysStbBdAndForcast3D-1}
+  \end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Problem 2: Tools for probabilistic security assessment}
+  \textbf{Contributions}:
+  \begin{itemize}
+  \item Method 1: Analytical approximations of the operating risk are developed. Technical details:
+    \begin{enumerate}
+    \item Second-order approximations of the parts of the stability boundary.
+    \item Hunter-Worsley bound as approximation of the probability of the intersection of events
+    \item Edgeworth approximations to approximate the probability of being beyond each part of the stability boundary.
+    \end{enumerate}
+  \item Method 2: Speed-up methods based on importance sampling for Monte-Carlo simulations are developed. Technical details:
+    \begin{itemize}
+    \item Second-order approximation of the stability boundary.
+    \item Optimal exponential twisting of the original distribution (adapted from application in finance, from large deviation theory).
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Analytical approximation}
+  \begin{block}{}
+Comparison between the estimate of the operating risk by crude Monte-Carlo simulations (CMC) and the analytical approximation in different cases (different productions at the controllable generators)
+  \end{block}
+\begin{columns}
+\column{0.4\textwidth}
+  \includegraphics[width=\textwidth]{Figs/ieee39buswind}
+\column{0.6\textwidth}
+\begin{tabular}{p{2.5cm}p{2.5cm}}
+\toprule
+Operating risk (CMC) & Operating risk (approx)\\
+\midrule
+7.7e-03 & 7.4e-03\tabularnewline
+8.2e-05 & 9.0e-05\tabularnewline
+1.1e-04 & 1.3e-04\tabularnewline
+1.7e-04 & 2.6e-04\tabularnewline
+2.0e-03 & 1.8e-03\tabularnewline
+\bottomrule
+\end{tabular}
+\textbf{Computational time}:
+\begin{itemize}
+\item CMC: 130-280 seconds.
+\item Our approximation: 0.05-0.5 second.
+\end{itemize}
+\end{columns}  
+\end{frame}
+
+\begin{frame}
+  \frametitle{Importance sampling method}
+  \begin{columns}
+    \column{0.5\textwidth}
+  \begin{tikzpicture}
+\pgftext{\centerline{\includegraphics[height=3cm,width=0.8\textwidth]{Figs/CMCsamples}}}
+\node[align=center,font=\scriptsize] (instab) at (0,1.2) {Unstable domain};
+\node[align=center,font=\scriptsize] (instab) at (0,-0.7) {Stable domain};
+\node[align=center] (title) at (0.2,2) {Crude Monte-Carlo};
+  \end{tikzpicture}
+    \column{0.5\textwidth}
+  \begin{tikzpicture}
+\pgftext{\centerline{\includegraphics[height=3cm,width=0.8\textwidth]{Figs/ISsamples}}}
+\node[align=center,font=\scriptsize] (instab) at (0,1.2) {Unstable domain};
+\node[align=center,font=\scriptsize,fill=white] (instab) at (0,-0.65) {Stable domain};
+\node[align=center] (title) at (0.4,2) {With importance sampling};
+  \end{tikzpicture}
+  \end{columns}
+\vskip0.15cm
+Key ideas:
+\begin{enumerate}
+\item we want to sample around the stability boundary $\Sigma_i$.
+\item we can get points on $\Sigma_i$ (continuation power flow).
+\item we can move the sampling distribution to these points $\Leftrightarrow$ Efficient IS distribution for the first-order approximation of the stability boundary.
+\item Not good in some cases $\rightarrow$ Instead, we use a IS distribution efficient for for the second-order approximation.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Importance sampling - results}
+\begin{block}{}
+Comparison between crude Monte-Carlo simulations (MCS) and MCS with importance sampling for different cases (different production levels in the controllable generators)    
+\end{block}
+\begin{columns}
+  \begin{column}{0.5\textwidth}
+    \includegraphics[width=1\textwidth]{Figs/ieee118.png}
+  \end{column}
+  \begin{column}{0.5\textwidth}
+  \begin{tabular}{ccc}
+\toprule
+Operating risk & Speed-up factor \\
+\midrule
+$7.3 \cdot 10^{-4}$ & 176 \\
+$3.4 \cdot 10^{-5}$ & 1750 \\
+$1 \cdot 10^{-6}$ & 18 000\\
+\bottomrule    
+  \end{tabular}   
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Problem 3: Tools for probabilistic security enhancement}
+  \begin{columns}
+    \column{0.7\textwidth}
+  \textbf{Challenges}:
+  \begin{itemize}
+  \item The operating risk must be embedded in the following optimization problem (chance-constrained optimal power flow CCOPF)
+    \begin{align*}
+      \min & \text{ Re-dispatch cost} \\
+      \text{such that} & \text{ Operating risk } \leq \alpha
+    \end{align*}
+  \item Operating risk must be expressed as a function of the production in the re-dispatchable generators.
+  \end{itemize}
+\column{0.3\textwidth}
+\includegraphics[height=4cm,width=1.5\textwidth]{Figs/KarysStbBdAndForcast3D-2}
+  \end{columns}
+\vskip0.2cm
+\textbf{Contributions}
+\begin{itemize}
+\item The analytical approximations developed for probabilistic security assessment are used to get a tractable approximation of the CCOPF above.
+\end{itemize} 
+\end{frame}
+
+\begin{frame}
+\frametitle{Chance-constrained optimal power flow: results}
+\begin{block}{}
+Chance-constrained optimal power flow:
+\begin{align*}
+  \min \quad & \text{Re-dispatch cost} \\ 
+  \text{s.t.} \quad & \text{Operating risk} \leq \alpha \%
+\end{align*}
+\end{block}
+\begin{center}
+\begin{tabular}{>{\raggedright\arraybackslash}p{4cm}rrrrr}
+  \toprule
+   $\alpha$ & $10^{-2}$ & $10^{-3}$ & $10^{-4}$ & $10^{-5}$ & $10^{-6}$\\
+   \midrule
+ Re-dispatch cost & 1.15 & 2.28 & 3.25 & 4.19 & 5.05 \\
+\midrule
+ Relative error due to approximations & 1 \% &  1 \% & 2 \%& 2 \%& 2 \%\\
+  \bottomrule
+\end{tabular}
+\end{center}
+\underline{Note}: there is a lot of ongoing research on CC-OPF now.
+\end{frame}
+
+\section{Conclusions}
+\begin{frame}
+\frametitle{Conclusion}
+\begin{itemize}
+\item Wind power poses new challenges for power system operation since it introduces more uncertainty.
+\item Today's way of operating power systems is very deterministic (N-1 criterion).
+\item New methods needed to account for the stochastic properties of wind power.
+\item Proposed solution: switch to probabilistic framework by assessing the probability of violation of operating constraints.
+\item Methods developed for security assessment = how to evaluate the probability of violation of operating constraints (approximation, estimation).
+\item Methods developed for security enhancement = how to control this probability $\Rightarrow$ Chance-constrained optimal power flow.
+\end{itemize}
+\end{frame}
+
+\begin{frame}[plain]
+\begin{center}
+Thank you!\\
+\vfill
+\includegraphics[width=0.8\textwidth]{Figs/wakes}
+\end{center}
+\end{frame}
+
+
+\end{document}
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
